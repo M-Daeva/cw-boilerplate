@@ -8,7 +8,8 @@
     "node": ">=12.x"
   },
   "scripts": {
-    "start": "ts-node ./index.ts"
+    "start": "ts-node ./index.ts",
+    "init": "sudo chmod +x ../testnet.sh && cp ../../.test-wallets/test_wallets.json ./test_wallets.json && npm i"
   },
   "repository": {
     "type": "git",

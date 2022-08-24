@@ -15,13 +15,13 @@ async function main() {
   });
   l("\n", res, "\n");
 
-  res = await aliceClient.execute(
-    ADDR.ALICE,
-    CONTR.ADDR,
-    { set: { count: 50 } },
-    gas
-  );
-  l({ attributes: res.logs[0].events[2].attributes }, "\n");
+  // res = await aliceClient.execute(
+  //   ADDR.ALICE,
+  //   CONTR.ADDR,
+  //   { set: { count: 50 } },
+  //   gas
+  // );
+  // l({ attributes: res.logs[0].events[2].attributes }, "\n");
 }
 
 main();

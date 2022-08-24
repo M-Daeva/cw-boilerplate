@@ -3,7 +3,9 @@ use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
-use {{crate_name}}::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
+use {{crate_name}}::messages::{
+    execute::ExecuteMsg, instantiate::InstantiateMsg, query::QueryMsg, response::CountResponse,
+};
 use {{crate_name}}::state::State;
 
 fn main() {

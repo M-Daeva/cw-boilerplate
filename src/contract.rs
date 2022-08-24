@@ -1,75 +1,63 @@
 #[cfg(not(feature = "library"))]
-use cosmwasm_std::entry_point;
-use cosmwasm_std::{to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
-use cw2::set_contract_version;
+use cosmwasm_std::{entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 
-use crate::error::ContractError;
-use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{State, STATE};
+use crate::{
+    actions::{execute::set, instantiate::init, migrate::migrate_contract, query::query_state},
+    error::ContractError,
+    messages::{
+        execute::ExecuteMsg, instantiate::InstantiateMsg, migrate::MigrateMsg, query::QueryMsg,
+    },
+};
 
-const CONTRACT_NAME: &str = "crates.io:{{project-name}}";
-const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
+/// Creates a new contract with the specified parameters packed in the "msg" variable
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    let initial_state = State {
-        owner: info.sender,
-        count: msg.count,
-    };
-
-    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    STATE.save(deps.storage, &initial_state)?;
-
-    Ok(Response::new()
-        .add_attribute("method", "instantiate")
-        .add_attribute("owner", initial_state.owner.to_string())
-        .add_attribute("count", initial_state.count.to_string()))
+    init(deps, env, info, msg)
 }
 
+/// Exposes all the execute functions available in the contract
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Set { count } => set(deps, info, count),
+        ExecuteMsg::Set { count } => set(deps, env, info, count),
     }
 }
 
-pub fn set(deps: DepsMut, info: MessageInfo, count: u8) -> Result<Response, ContractError> {
-    let state = STATE.load(deps.storage)?;
-
-    if info.sender != state.owner {
-        return Err(ContractError::CustomError {
-            val: "Sender is not owner!".to_string(),
-        });
-    }
-
-    state.count = count;
-    STATE.save(deps.storage, &state)?;
-
-    Ok(Response::new()
-        .add_attribute("method", "set")
-        .add_attribute("owner", state.owner.to_string())
-        .add_attribute("count", state.count.to_string()))
-}
-
+/// Exposes all the queries available in the contract
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, env: Env, info: MessageInfo, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => query_state(deps),
+        QueryMsg::GetCount {} => query_state(deps, env, info),
     }
 }
 
-pub fn query_state(deps: Deps) -> StdResult<Binary> {
-    let state = STATE.load(deps.storage)?;
-
-    to_binary(&CountResponse { count: state.count })
+/// Used for contract migration
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: MigrateMsg,
+) -> Result<Response, ContractError> {
+    migrate_contract(deps, env, info, msg)
 }
+
+// /// The entry point to the contract for processing replies from submessages
+// #[cfg_attr(not(feature = "library"), entry_point)]
+// pub fn reply(
+//     deps: Deps,
+//     env: Env,
+//     info: MessageInfo,
+//     msg: Reply,
+// ) -> Result<Response, ContractError> {
+// }
