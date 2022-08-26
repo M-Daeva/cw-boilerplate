@@ -35,29 +35,18 @@ pub fn execute(
 
 /// Exposes all the queries available in the contract
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, env: Env, info: MessageInfo, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => query_state(deps, env, info),
+        QueryMsg::GetCount {} => query_state(deps, env),
     }
 }
 
 /// Used for contract migration
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn migrate(
-    deps: DepsMut,
-    env: Env,
-    info: MessageInfo,
-    msg: MigrateMsg,
-) -> Result<Response, ContractError> {
-    migrate_contract(deps, env, info, msg)
+pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> Result<Response, ContractError> {
+    migrate_contract(deps, env, msg)
 }
 
 // /// The entry point to the contract for processing replies from submessages
 // #[cfg_attr(not(feature = "library"), entry_point)]
-// pub fn reply(
-//     deps: Deps,
-//     env: Env,
-//     info: MessageInfo,
-//     msg: Reply,
-// ) -> Result<Response, ContractError> {
-// }
+// pub fn reply(deps: Deps, env: Env, msg: Reply) -> Result<Response, ContractError> {}
