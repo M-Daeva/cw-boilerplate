@@ -38,9 +38,9 @@ fn test_set() {
 
 #[test]
 fn test_query() {
-    let (deps, env, info, _) = get_instance(VALUE1, ADDR1);
+    let (deps, env, _, _) = get_instance(VALUE1, ADDR1);
     let msg = QueryMsg::GetCount {};
-    let bin = query(deps.as_ref(), env, info, msg).unwrap();
+    let bin = query(deps.as_ref(), env, msg).unwrap();
     let res = from_binary::<CountResponse>(&bin).unwrap();
 
     assert_eq!(res.count, VALUE1);
